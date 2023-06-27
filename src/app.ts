@@ -92,7 +92,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// pumpRequest();
+pumpRequest();
 
 server.listen(port, () =>
   console.log(`server is running in  http://${host}:${port}`)
