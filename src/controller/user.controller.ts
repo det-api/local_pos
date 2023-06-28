@@ -13,8 +13,8 @@ import {
 } from "../service/user.service";
 
 import fMsg from "../utils/helper";
-import { getRole } from "../service/role.service";
 import { getPermit } from "../service/permit.service";
+import { getRole } from "../service/role.service";
 
 export const registerUserHandler = async (
   req: Request,

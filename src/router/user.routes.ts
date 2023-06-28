@@ -14,12 +14,7 @@ import {
   userRemovePermitHandler,
   userRemoveRoleHandler,
 } from "../controller/user.controller";
-import {
-  createUserSchema,
-  loginUserSchema,
-  userPermitSchema,
-  userRoleSchema,
-} from "../schema/scheama";
+import { createUserSchema, loginUserSchema, userPermitSchema, userRoleSchema } from "../schema/schema";
 
 //register user
 userRoute.post("/register", validateAll(createUserSchema), registerUserHandler);
@@ -40,7 +35,6 @@ userRoute.patch(
 userRoute.get("/", validateToken, getUserHandler);
 
 //delete each user
-
 userRoute.delete(
   "/",
   validateToken,
