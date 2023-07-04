@@ -6,10 +6,10 @@ import fileUpload from "express-fileupload";
 import userRoute from "./router/user.routes";
 import mqtt from "mqtt";
 import auth from "./router/auth.routes";
-import { pumpRequest } from "./utils/pumpRequest";
 import permitRoute from "./router/permit.routes";
 import roleRoute from "./router/role.routes";
 import detailSaleRoute from "./router/detailSale.routes";
+import localToDeviceRoute from "./router/localToDevice.routes";
 
 const app = express();
 app.use(express.json());
@@ -20,9 +20,9 @@ const server = require("http").createServer(app);
 
 //mqtt
 
-export const client = mqtt.connect("ws://192.168.0.101:8884", {
+export const client = mqtt.connect("ws://192.168.0.112:9001" , {
   username: "detpos",
-  password: "det131337329",
+  password: "asdffdsa",
 });
 
 export const sub_topic = "detpos/local_server/";
@@ -90,6 +90,8 @@ app.use("/api/auth", auth);
 
 app.use("/api/detail-sale", detailSaleRoute);
 
+app.use("/api/device-connection", localToDeviceRoute);
+
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   err.status = err.status || 409;
   res.status(err.status).json({
@@ -97,8 +99,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     msg: err.message,
   });
 });
-
-pumpRequest();
 
 server.listen(port, () =>
   console.log(`server is running in  http://${host}:${port}`)

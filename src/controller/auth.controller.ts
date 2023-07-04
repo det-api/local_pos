@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { client } from "../app";
 import { sub_topic } from "../app";
 import fMsg from "../utils/helper";
-import { number } from "zod";
 
 export const postAuthHandler = async (
   req: Request,
@@ -16,7 +15,7 @@ export const postAuthHandler = async (
       throw new Error("you need pumpNo or message");
     }
 
-    client.publish(sub_topic + "ap/" + pumpNo, message);
+    client.publish(sub_topic +  pumpNo, message+'appro');
     fMsg(res, "all is well");
   } catch (e) {
     console.log(e);
