@@ -1,8 +1,8 @@
-import { connectDeviceHandler } from "../controller/localToDevice.controller";
+import { connectDeviceHandler, devicePermitHandler } from "../controller/localToDevice.controller";
 const localToDeviceRoute = require("express").Router();
 
-localToDeviceRoute.post('/' , connectDeviceHandler)
+localToDeviceRoute.post('/whreq' , connectDeviceHandler)
 
-localToDeviceRoute.post('/' , )
+localToDeviceRoute.post('/device-permit' , devicePermitHandler)
  
 export default localToDeviceRoute

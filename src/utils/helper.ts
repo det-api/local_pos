@@ -2,6 +2,8 @@ import { Response } from "express";
 import config from "config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { client } from "../app";
+
 
 const saltWorkFactor = config.get<number>("saltWorkFactor");
 const secretKey = config.get<string>("secretKey");
@@ -47,6 +49,11 @@ export const fMsg2 = (
   result: any = []
 ) => {
   res.status(status).json({ con: true, msg, result });
+};
+
+export const mqttEmitter = (topic: string, message: string) => {
+  client.publish(topic , message);
+  
 };
 
 export default fMsg;

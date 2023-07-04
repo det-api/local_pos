@@ -5,7 +5,6 @@ import cors from "cors";
 import fileUpload from "express-fileupload";
 import userRoute from "./router/user.routes";
 import mqtt from "mqtt";
-import auth from "./router/auth.routes";
 import permitRoute from "./router/permit.routes";
 import roleRoute from "./router/role.routes";
 import detailSaleRoute from "./router/detailSale.routes";
@@ -40,7 +39,7 @@ const connect = () => {
 client.on("connect", connect);
 
 client.on("message", async (topic, message) => {
-  // console.log(topic, "///", message.toString());
+  console.log(topic, "///", message.toString());
   // let income = topic + "/" + message.toString();
   //reseive data from device
 });
@@ -86,7 +85,6 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 app.use("/api/user", userRoute);
 app.use("/api/permit", permitRoute);
 app.use("/api/role", roleRoute);
-app.use("/api/auth", auth);
 
 app.use("/api/detail-sale", detailSaleRoute);
 
