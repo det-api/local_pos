@@ -9,6 +9,12 @@ import permitRoute from "./router/permit.routes";
 import roleRoute from "./router/role.routes";
 import detailSaleRoute from "./router/detailSale.routes";
 import localToDeviceRoute from "./router/localToDevice.routes";
+import coustomerRoute from "./router/coustomer.routes";
+import deviceRoute from "./router/device.routes";
+import debtRoute from "./router/debt.routes";
+import dailyReportRoute from "./router/dailyReport.routes";
+import fuelBalanceRoute from "./router/fuelBalance.routes";
+import fuelInRoute from "./router/fuelIn.routes";
 
 const app = express();
 app.use(express.json());
@@ -89,6 +95,14 @@ app.use("/api/role", roleRoute);
 app.use("/api/detail-sale", detailSaleRoute);
 
 app.use("/api/device-connection", localToDeviceRoute);
+app.use("/api/coustomer" , coustomerRoute)
+app.use('/api/device' , deviceRoute)
+
+app.use('/api/debt' , debtRoute)
+
+app.use("/api/daily-report", dailyReportRoute);
+app.use("/api/fuel-balance", fuelBalanceRoute);
+app.use("/api/fuelIn", fuelInRoute);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   err.status = err.status || 409;

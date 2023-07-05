@@ -22,11 +22,16 @@ const detailSaleSchema = new Schema({
   stationDetailId: {
     type: Schema.Types.ObjectId,
     require: true,
-    ref: "stationDetail",
+    default : "6464e9f1c45b82216ab1db6b"
+  },
+  cou_id: {
+    type: Schema.Types.ObjectId,
+    require: true,
+    ref : 'coustomer'
   },
   vocono: { type: String, required: true, unique: true },
-  carNo: { type: String, default: null }, //manual
-  vehicleType: { type: String, default: "car" }, //manual
+  carNo: { type: String, default: null }, 
+  vehicleType: { type: String, default: "car" }, 
   nozzleNo: { type: Number, required: true },
   fuelType: { type: String, required: true },
   cashType: { type: String, default: "cash" },
