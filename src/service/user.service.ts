@@ -44,6 +44,7 @@ export const loginUser = async ({
 
 export const getUser = async (query: FilterQuery<UserDocument>) => {
   try {
+    // console.log('wk')
     return await userModel
       .find(query)
       .lean()
@@ -54,12 +55,12 @@ export const getUser = async (query: FilterQuery<UserDocument>) => {
   }
 };
 
-export const updateUser= async (
+export const updateUser = async (
   query: FilterQuery<UserDocument>,
   body: UpdateQuery<UserDocument>
 ) => {
   try {
-    await userModel.updateMany(query, body);
+    await userModel.updateMany(query, body).select("-password -__v");
     return await userModel.find(query).lean();
   } catch (e) {
     throw new Error(e);
@@ -108,7 +109,7 @@ export const userAddPermit = async (
 ) => {
   try {
     await userModel.findByIdAndUpdate(userId, { $push: { permits: permitId } });
-    return await userModel.findById(userId);
+    return await userModel.findById(userId).select("-password -__v");
   } catch (e: any) {
     throw new Error(e);
   }

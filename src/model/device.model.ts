@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { string } from "zod";
 
 export interface deviceDocument extends mongoose.Document{
   dep_no : string
@@ -7,9 +8,9 @@ export interface deviceDocument extends mongoose.Document{
 }
 
 const deviceSchema = new Schema({
-   dep_no : {type: String , require : true},
-   nozzle_no : {type: String , require : true},
-   fuel_type : {type: String , require : true}
+   dep_no : {type: String , require : true}, //1
+   nozzle_no : {type: String , require : true},  //5
+   fuel_type : {type: String , require : true},
 });
 
 

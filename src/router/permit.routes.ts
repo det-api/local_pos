@@ -12,22 +12,22 @@ import { allSchemaId, permitSchema } from "../schema/schema";
   
   permitRoute.get(
     "/",
-    validateToken,
-    roleValidator(["admin"]),
+    // validateToken,
+    // roleValidator(["admin"]),
     getPermitHandler
   );
   permitRoute.post(
     "/",
-    validateToken,
-    validateAll(permitSchema),
-    roleValidator(["admin"]),
+    // validateToken,
+    // validateAll(permitSchema),
+    // roleValidator(["admin"]),
     addPermitHandler
   );
   permitRoute.delete(
     "/",
-    validateToken,
-    validateAll(allSchemaId),
-    roleValidator(["admin"]),
+    // validateToken,
+    // validateAll(allSchemaId),
+    // roleValidator(["admin"]),
     deletPermitHandler
   );
   

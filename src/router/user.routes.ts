@@ -32,14 +32,18 @@ userRoute.patch(
 );
 
 //getuser
-userRoute.get("/", validateToken, getUserHandler);
+userRoute.get(
+  "/",
+  // validateToken,
+  getUserHandler
+  );
 
 //delete each user
 userRoute.delete(
   "/",
-  validateToken,
-  roleValidator(["admin"]),
-  hasAnyPermit(["delete"]),
+  // validateToken,
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["delete"]),
   deleteUserHandler
 );
 
@@ -51,38 +55,62 @@ userRoute.get("/admin", validateToken, getUserByAdminHandler);
 //adding role in user
 userRoute.patch(
   "/add/role",
-  validateToken,
-  validateAll(userRoleSchema),
-  roleValidator(["admin"]),
-  hasAnyPermit(["add"]),
+  // validateToken,
+  // validateAll(userRoleSchema),
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["add"]),
   userAddRoleHandler
 );
 
 userRoute.patch(
   "/remove/role",
   validateToken,
-  validateAll(userRoleSchema),
-  roleValidator(["admin"]),
-  hasAnyPermit(["delete"]),
+  // validateAll(userRoleSchema),
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["delete"]),
   userRemoveRoleHandler
 );
 
 //adding permit in user
 userRoute.patch(
   "/add/permit",
-  validateToken,
-  validateAll(userPermitSchema),
-  roleValidator(["admin"]),
-  hasAnyPermit(["add"]),
+  // validateToken,
+  // validateAll(userPermitSchema),
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["add"]),
   userAddPermitHandler
 );
 userRoute.patch(
   "/remove/permit",
-  validateToken,
-  validateAll(userPermitSchema),
-  roleValidator(["admin"]),
-  hasAnyPermit(["delete"]),
+  // validateToken,
+  // validateAll(userPermitSchema),
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["delete"]),
   userRemovePermitHandler
 );
 
 export default userRoute;
+
+
+// [
+//   {
+//       "_id": "64a51e63ac2749c9d16092a5",
+//       "name": "add",
+//       "__v": 0
+//   },
+//   {
+//       "_id": "64a51e70ac2749c9d16092a7",
+//       "name": "view",
+//       "__v": 0
+//   },
+//   {
+//       "_id": "64a51e77ac2749c9d16092a9",
+//       "name": "edit",
+//       "__v": 0
+//   },
+//   {
+//       "_id": "64a51e7eac2749c9d16092ab",
+//       "name": "delete",
+//       "__v": 0
+//   }
+// ]

@@ -54,6 +54,7 @@ export const roleAddPermitHandler = async (
   next: NextFunction
 ) => {
   try {
+
     let role = await getRole({ _id: req.body.roleId });
     let permit = await getPermit({ _id: req.body.permitId });
     if (!role[0] || !permit[0]) {

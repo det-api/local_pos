@@ -1,4 +1,5 @@
-import { client } from "../app";
+import { client } from "../app"
+
 
 const serverToDev = "detpos/local_server/whreq";
 const devToServer = "detpos/device/whreq";

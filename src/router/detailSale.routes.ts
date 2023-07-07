@@ -20,38 +20,35 @@ const detailSaleRoute = require("express").Router();
 
 detailSaleRoute.get(
   "/pagi/:page",
-  validateToken,
+  // validateToken,
   // hasAnyPermit(["view"]),
   getDetailSaleHandler
 );
 
 detailSaleRoute.get(
   "/by-date",
-  // validateToken,
+  validateToken,
   // hasAnyPermit(["view"]),
   getDetailSaleByDateHandler
 );
 
 detailSaleRoute.get(
   "/pagi/by-date/:page",
-  validateToken,
-  hasAnyPermit(["view"]),
+  // validateToken,
+  // hasAnyPermit(["view"]),
   getDetailSaleDatePagiHandler
 );
 
 //that for only device
 detailSaleRoute.post("/", validateToken, addDetailSaleHandler);
-detailSaleRoute.patch(
-  "/",
-  updateDetailSaleHandler
-);
+detailSaleRoute.patch("/", updateDetailSaleHandler);
 
 detailSaleRoute.delete(
   "/",
-  validateToken,
-  roleValidator(["admin"]),
-  hasAnyPermit(["delete"]),
-  validateAll(allSchemaId),
+  // validateToken,
+  // roleValidator(["admin"]),
+  // hasAnyPermit(["delete"]),
+  // validateAll(allSchemaId),
   deleteDetailSaleHandler
 );
 

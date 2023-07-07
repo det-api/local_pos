@@ -5,6 +5,8 @@ import cors from "cors";
 import fileUpload from "express-fileupload";
 import userRoute from "./router/user.routes";
 import mqtt from "mqtt";
+
+
 import permitRoute from "./router/permit.routes";
 import roleRoute from "./router/role.routes";
 import detailSaleRoute from "./router/detailSale.routes";
@@ -15,6 +17,7 @@ import debtRoute from "./router/debt.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import fuelInRoute from "./router/fuelIn.routes";
+import { detailSaleUpdateByDevice } from "./service/detailSale.service";
 
 const app = express();
 app.use(express.json());
@@ -25,12 +28,13 @@ const server = require("http").createServer(app);
 
 //mqtt
 
-export const client = mqtt.connect("ws://192.168.0.112:9001" , {
+export const client = mqtt.connect("ws://192.168.0.105:9001", {
   username: "detpos",
   password: "asdffdsa",
 });
 
-export const sub_topic = "detpos/local_server/";
+export const pub_topic = "detpos/local_server/";
+export const sub_topic = "detpos/device/"
 
 const connect = () => {
   client.subscribe("#", { qos: 0 }, function (err) {
@@ -42,12 +46,26 @@ const connect = () => {
   });
 };
 
+
+
 client.on("connect", connect);
 
 client.on("message", async (topic, message) => {
   console.log(topic, "///", message.toString());
+
+  let data= topic.split("/")
+  // console.log(data)
+
+  if(data[2] == "Final"){
+    detailSaleUpdateByDevice(data[3] , message.toString())
+  }
+
+  // if (topic == "detpos/device/1") {
+  //   client.publish("detpos/device/1", message + "appro");
+  // }
   // let income = topic + "/" + message.toString();
   //reseive data from device
+
 });
 
 // socket
@@ -76,6 +94,8 @@ const port = config.get<number>("port");
 const host = config.get<string>("host");
 const dbUrl = config.get<string>("dbUrl");
 
+
+
 //mongodb connection
 
 mongoose.connect(dbUrl);
@@ -95,10 +115,10 @@ app.use("/api/role", roleRoute);
 app.use("/api/detail-sale", detailSaleRoute);
 
 app.use("/api/device-connection", localToDeviceRoute);
-app.use("/api/coustomer" , coustomerRoute)
-app.use('/api/device' , deviceRoute)
+app.use("/api/coustomer", coustomerRoute);
+app.use("/api/device", deviceRoute);
 
-app.use('/api/debt' , debtRoute)
+app.use("/api/debt", debtRoute);
 
 app.use("/api/daily-report", dailyReportRoute);
 app.use("/api/fuel-balance", fuelBalanceRoute);
