@@ -8,6 +8,7 @@ import {
   detailSalePaginate,
   detailSaleByDate,
   detailSaleByDateAndPagi,
+  detailSaleUpdateError,
   // detailSaleByDate,
 } from "../service/detailSale.service";
 import {
@@ -17,6 +18,7 @@ import {
 } from "../service/fuelBalance.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
 import { addDailyReport } from "../service/dailyReport.service";
+import { deviceLiveData } from "../connection/liveTimeData";
 
 export const getDetailSaleHandler = async (
   req: Request,
@@ -45,71 +47,67 @@ export const addDetailSaleHandler = async (
     if (!depNo || !nozzleNo) {
       throw new Error("you need pumpNo or message");
     }
-    //that is remove after pos updated
-    // if that message is already exist that respone 200
-    let check = await getDetailSale({ vocono: req.body.vocono });
-    if (check.length != 0) {
-      fMsg(res, "Data with that Vocono is already exist");
-      return;
-    }
 
     // that is save in data base
-    let result = await addDetailSale(depNo,nozzleNo,req.body);
+    let result = await addDetailSale(depNo, nozzleNo, req.body);
 
-    // console.log(req.body)
+    //*****that fuelbalance section */
 
     // that is check the data with date already exist or not
-    let checkDate = await getFuelBalance({
-      stationId: req.body.stationDetailId,
-      createAt: req.body.dailyReportDate,
-    });
+
+    // let checkDate = await getFuelBalance({
+    //   stationId: req.body.stationDetailId,
+    //   createAt: req.body.dailyReportDate,
+    // });
 
     // create the data in fuel balance db data with today date is not exist in db
-    if (checkDate.length == 0) {
-      await addDailyReport({
-        stationId: req.body.stationDetailId,
-        dateOfDay: req.body.dailyReportDate,
-      });
 
-      let prevDate = previous(new Date(req.body.dailyReportDate));
-      let prevResult = await getFuelBalance({
-        stationId: req.body.stationDetailId,
-        createAt: prevDate,
-      });
-      // console.log(prevResult);
-      await Promise.all(
-        prevResult.map(async (ea) => {
-          let obj: fuelBalanceDocument;
-          if (ea.balance == 0) {
-            obj = {
-              stationId: ea.stationId,
-              fuelType: ea.fuelType,
-              capacity: ea.capacity,
-              opening: ea.opening + ea.fuelIn,
-              tankNo: ea.tankNo,
-              createAt: req.body.dailyReportDate,
-              nozzles: ea.nozzles,
-              balance: ea.opening + ea.fuelIn,
-            } as fuelBalanceDocument;
-          } else {
-            obj = {
-              stationId: ea.stationId,
-              fuelType: ea.fuelType,
-              capacity: ea.capacity,
-              opening: ea.opening + ea.fuelIn - ea.cash,
-              tankNo: ea.tankNo,
-              createAt: req.body.dailyReportDate,
-              nozzles: ea.nozzles,
-              balance: ea.opening + ea.fuelIn - ea.cash,
-            } as fuelBalanceDocument;
-          }
+    // if (checkDate.length == 0) {
+    //   await addDailyReport({
+    //     stationId: req.body.stationDetailId,
+    //     dateOfDay: req.body.dailyReportDate,
+    //   });
 
-          await addFuelBalance(obj);
-        })
-      );
-    }
+    //   let prevDate = previous(new Date(req.body.dailyReportDate));
+    //   let prevResult = await getFuelBalance({
+    //     stationId: req.body.stationDetailId,
+    //     createAt: prevDate,
+    //   });
+    //   // console.log(prevResult);
+    //   await Promise.all(
+    //     prevResult.map(async (ea) => {
+    //       let obj: fuelBalanceDocument;
+    //       if (ea.balance == 0) {
+    //         obj = {
+    //           stationId: ea.stationId,
+    //           fuelType: ea.fuelType,
+    //           capacity: ea.capacity,
+    //           opening: ea.opening + ea.fuelIn,
+    //           tankNo: ea.tankNo,
+    //           createAt: req.body.dailyReportDate,
+    //           nozzles: ea.nozzles,
+    //           balance: ea.opening + ea.fuelIn,
+    //         } as fuelBalanceDocument;
+    //       } else {
+    //         obj = {
+    //           stationId: ea.stationId,
+    //           fuelType: ea.fuelType,
+    //           capacity: ea.capacity,
+    //           opening: ea.opening + ea.fuelIn - ea.cash,
+    //           tankNo: ea.tankNo,
+    //           createAt: req.body.dailyReportDate,
+    //           nozzles: ea.nozzles,
+    //           balance: ea.opening + ea.fuelIn - ea.cash,
+    //         } as fuelBalanceDocument;
+    //       }
+
+    //       await addFuelBalance(obj);
+    //     })
+    //   );
+    // }
 
     // calculation for fuel balance
+
     // await calcFuelBalance(
     //   {
     //     stationId: result.stationDetailId,
@@ -134,6 +132,33 @@ export const updateDetailSaleHandler = async (
   try {
     let result = await updateDetailSale(req.query, req.body);
     fMsg(res, "updated DetailSale data", result);
+  } catch (e) {
+    next(new Error(e));
+  }
+};
+
+export const detailSaleUpdateErrorHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let nozzleNo = req.query.nozzleNo;
+    // console.log("wk");
+    console.log(nozzleNo);
+
+    let [saleLiter, totalPrice] = deviceLiveData.get(nozzleNo);
+
+    console.log(saleLiter);
+
+    req.body = {
+      ...req.body,
+      saleLiter: saleLiter,
+      totalPrice: totalPrice,
+    };
+
+    let result = await detailSaleUpdateError(req.query, req.body);
+    fMsg(res, "updated DetailSale error data", result);
   } catch (e) {
     next(new Error(e));
   }

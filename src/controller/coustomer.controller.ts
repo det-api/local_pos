@@ -4,6 +4,7 @@ import {
   addCoustomer,
   deleteCoustomer,
   getCoustomer,
+  searchCoustomer,
 } from "../service/coustomer.service";
 
 export const getCoustomerHandler = async (
@@ -40,6 +41,22 @@ export const deletCoustomerHandler = async (
   try {
     await deleteCoustomer(req.query);
     fMsg(res, "Coustomer was deleted");
+  } catch (e) {
+    next(new Error(e));
+  }
+};
+
+export const searchCoustomerHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    let key = req.params.key;
+    // searchCoustomer(key)
+    console.log(typeof key);
+    let result = await searchCoustomer(key);
+    fMsg(res, "search result", result);
   } catch (e) {
     next(new Error(e));
   }

@@ -4,11 +4,14 @@ import config from "config";
 import { UserDocument } from "../model/user.model";
 import moment from "moment-timezone";
 import { mqttEmitter } from "../utils/helper";
-
 import axios from "axios";
+import { getCoustomer } from "./coustomer.service";
+import { addDebt } from "./debt.service";
+import { deviceLiveData } from "../connection/liveTimeData";
 
 const currentDate = moment().tz("Asia/Yangon").format("YYYY-MM-DD");
 const cuurentDateForVocono = moment().tz("Asia/Yangon").format("DDMMYYYY");
+
 const url = "http://localhost:7000/api/detail-sale";
 
 interface Data {
@@ -17,6 +20,7 @@ interface Data {
   vocono: string;
   casherCode: string;
   asyncAlready: string;
+  stationDetailId: string;
   user: UserDocument[];
 }
 
@@ -48,19 +52,27 @@ export const addDetailSale = async (
       vocono: `${body.user[0].stationNo}/${
         body.user[0].name
       }/${cuurentDateForVocono}/${count + 1}`,
+      stationDetailId: body.user[0].stationId,
       casherCode: body.user[0].name,
       asyncAlready: "0",
     };
 
-    // const lastDocument = await detailSaleModel
-    //   .findOne({ nozzleNo: body.nozzleNo })
-    //   .sort({ _id: -1 , createAt: -1 });
+    const lastDocument = await detailSaleModel
+      .findOne({ nozzleNo: body.nozzleNo })
+      .sort({ _id: -1, createAt: -1 });
 
-    // if (lastDocument?.saleLiter == 0 || lastDocument?.vehicleType == null) {
-    //   throw new Error("you need to fill");
-    // }
+    console.log(lastDocument);
+
+    if (
+      lastDocument?.saleLiter == 0 ||
+      lastDocument?.vehicleType == null ||
+      lastDocument?.totalPrice == 0
+    ) {
+      throw new Error("you need to fill previous vol");
+    }
 
     let result = await new detailSaleModel(body).save();
+
     mqttEmitter(`detpos/local_server/${depNo}`, nozzleNo + "appro");
     return result;
   } catch (e) {
@@ -76,63 +88,93 @@ export const updateDetailSale = async (
     let data = await detailSaleModel.findOne(query);
     if (!data) throw new Error("no data with that id");
 
-    switch (data.asyncAlready) {
-      case "0":
-        console.log("wk0");
-        body = {
-          ...body,
-          asyncAlready: "1",
-        };
-        break;
-      case "2":
-        body = {
-          ...body,
-          asyncAlready: "3",
-        };
-        break;
-    }
+    //$debt
+
+    // if (data.cashType == "Debt") {
+    //   let coustomerConditon = await getCoustomer({ _id: data.couObjId });
+
+    //   if (coustomerConditon.length == 0)
+    //     throw new Error("There is no coustomer with that name");
+
+    //   let debtBody = {
+    //     stationDetailId: data.stationDetailId,
+    //     vocono: data.vocono,
+    //     couObjId: data.couObjId,
+    //     deposit: 0,
+    //     credit: data.totalPrice,
+    //     liter: data.saleLiter,
+    //   };
+
+    //   let debtResult = await addDebt(debtBody);
+
+    //   console.log(debtResult);
+    // }
 
     await detailSaleModel.updateMany(query, body);
 
-    let updatedData = await detailSaleModel.find({ asyncAlready: 3 });
+    let updatedData = await detailSaleModel.find({ asyncAlready: 1 });
 
     updatedData.forEach(async (ea) => {
       try {
         let response = await axios.post(url, ea);
         console.log(response.status);
-
         if (response.status == 200) {
           await detailSaleModel.findByIdAndUpdate(ea._id, {
-            asyncAlready: "4",
+            asyncAlready: "2",
           });
         }
       } catch (e) {
         throw new Error(e);
       }
     });
+
     return await detailSaleModel.findById(data._id).lean();
   } catch (e) {
     throw new Error(e);
   }
 };
 
-export const detailSaleUpdateByDevice = async (topic, message) => {
-  console.log(topic, message);
+export const detailSaleUpdateError = async (
+  query: FilterQuery<detailSaleDocument>,
+  body: UpdateQuery<detailSaleDocument>
+) => {
+  try {
+    let data = await detailSaleModel.findOne(query);
+    if (!data) throw new Error("no data with that id");
 
+    const lastData: any = await detailSaleModel
+      .find({ nozzleNo: data.nozzleNo })
+      .sort({ _id: -1, createAt: -1 })
+      .limit(2);
+
+    body = {
+      ...body,
+      asyncAlready: "1",
+      totalizer_liter: lastData[1]
+        ? lastData[1].totalizer_liter + Number(body.saleLiter)
+        : 0 + Number(body.saleLiter),
+      totalizer_amount: lastData[1]
+        ? lastData[1].totalizer_amount + Number(body.totalPrice)
+        : 0 + Number(body.totalPrice),
+      isError: true,
+    };
+
+    let result = await detailSaleModel.findOneAndUpdate(query, body);
+
+    return await detailSaleModel.findOne({ _id: result?._id });
+  } catch (e) {
+    throw new Error(e);
+  }
+};
+
+export const detailSaleUpdateByDevice = async (topic: string, message) => {
   const regex = /[A-Z]/g;
-
   let data: number[] = message.split(regex);
-  // console.log(Number(data[0]))
+
+  let [saleLiter, totalPrice] = deviceLiveData.get(data[0]);
 
   let query = {
     nozzleNo: data[0],
-  };
-  let updateBody: UpdateQuery<detailSaleDocument> = {
-    nozzleNo: data[0],
-    salePrice: data[1],
-    saleLiter: data[2],
-    totalPrice: data[3],
-    totalizer_liter: data[4],
   };
 
   const lastData: any = await detailSaleModel
@@ -140,50 +182,35 @@ export const detailSaleUpdateByDevice = async (topic, message) => {
     .sort({ _id: -1, createAt: -1 })
     .limit(2);
 
-  console.log(lastData);
-
-  switch (lastData[0].asyncAlready) {
-    case "0":
-      console.log("wk0");
-      updateBody = {
-        ...updateBody,
-        asyncAlready: "2",
-      };
-      break;
-    case "1":
-      console.log("wk0");
-      updateBody = {
-        ...updateBody,
-        asyncAlready: "3",
-      };
-      break;
+  if (saleLiter == 0 || (saleLiter == null && data[2] == 0)) {
+    await detailSaleModel.findByIdAndDelete(lastData[0]?._id);
+    mqttEmitter(
+      "detpos/local_server/message",
+      `${lastData[0].nozzleNo} was deleted`
+    );
+    return;
   }
 
-  updateBody = {
-    ...updateBody,
+  let updateBody: UpdateQuery<detailSaleDocument> = {
+    nozzleNo: data[0],
+    salePrice: data[1],
+    saleLiter: saleLiter,
+    totalPrice: totalPrice,
+    asyncAlready: "1",
+    totalizer_liter: lastData[1]
+      ? lastData[1].totalizer_liter + Number(saleLiter)
+      : 0 + Number(saleLiter),
     totalizer_amount: lastData[1]
-      ? lastData[1].totalizer_amount + Number(data[3])
-      : 0 + Number(data[3]),
+      ? lastData[1].totalizer_amount + Number(totalPrice)
+      : 0 + Number(totalPrice),
   };
 
-  await detailSaleModel.findByIdAndUpdate(lastData[0]._id , updateBody)
-  let updatedData = await detailSaleModel.find({ asyncAlready: 3 });
-  updatedData.forEach(async (ea) => {
-    try {
-      let response = await axios.post(url, ea);
-      console.log(response.status);
+  let result = await detailSaleModel.findByIdAndUpdate(
+    lastData[0]._id,
+    updateBody
+  );
 
-      if (response.status == 200) {
-        await detailSaleModel.findByIdAndUpdate(ea._id, {
-          asyncAlready: "4",
-        });
-      }
-    } catch (e) {
-      throw new Error(e);
-    }
-  });
-
-  return await detailSaleModel.findById(lastData[0]._id);
+  mqttEmitter("detpos/local_server", `${result?.nozzleNo}/D1S1`);
 };
 
 export const deleteDetailSale = async (

@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { client } from "../app";
 
-
 const saltWorkFactor = config.get<number>("saltWorkFactor");
 const secretKey = config.get<string>("secretKey");
 const salt = bcrypt.genSaltSync(saltWorkFactor);
@@ -52,8 +51,7 @@ export const fMsg2 = (
 };
 
 export const mqttEmitter = (topic: string, message: string) => {
-  client.publish(topic , message);
-  
+  client.publish(topic, message);
 };
 
 export default fMsg;

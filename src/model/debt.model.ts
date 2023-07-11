@@ -3,9 +3,11 @@ import { Schema } from "mongoose";
 
 export interface debtInput {
   stationDetailId: string;
-  cou_objId: string;
+  couObjId: string;
+  vocono: string;
   credit: number;
   deposit: number;
+  liter: number;
 }
 
 export interface debtDocument extends debtInput, mongoose.Document {
@@ -26,8 +28,10 @@ const debtSchema = new Schema(
       require: true,
       ref: "coustomer",
     },
+    vocono: { type: String, require: true, unique: true },
     credit: { type: Number, default: 0 },
     deposit: { type: Number, default: 0 },
+    liter: { type: Number, default: 0 },
     dateOfDay: {
       type: String,
       default: new Date().toLocaleDateString(`fr-CA`),

@@ -1,6 +1,7 @@
 import {
   addDetailSaleHandler,
   deleteDetailSaleHandler,
+  detailSaleUpdateErrorHandler,
   getDetailSaleByDateHandler,
   getDetailSaleDatePagiHandler,
   getDetailSaleHandler,
@@ -27,7 +28,7 @@ detailSaleRoute.get(
 
 detailSaleRoute.get(
   "/by-date",
-  validateToken,
+  // validateToken,
   // hasAnyPermit(["view"]),
   getDetailSaleByDateHandler
 );
@@ -42,6 +43,7 @@ detailSaleRoute.get(
 //that for only device
 detailSaleRoute.post("/", validateToken, addDetailSaleHandler);
 detailSaleRoute.patch("/", updateDetailSaleHandler);
+detailSaleRoute.patch("/error", detailSaleUpdateErrorHandler);
 
 detailSaleRoute.delete(
   "/",

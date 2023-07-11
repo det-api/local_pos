@@ -6,7 +6,6 @@ import fileUpload from "express-fileupload";
 import userRoute from "./router/user.routes";
 import mqtt from "mqtt";
 
-
 import permitRoute from "./router/permit.routes";
 import roleRoute from "./router/role.routes";
 import detailSaleRoute from "./router/detailSale.routes";
@@ -17,6 +16,8 @@ import debtRoute from "./router/debt.routes";
 import dailyReportRoute from "./router/dailyReport.routes";
 import fuelBalanceRoute from "./router/fuelBalance.routes";
 import fuelInRoute from "./router/fuelIn.routes";
+// import { detailSaleUpdateByDevice } from "./service/detailSale.service";
+import { liveDataChangeHandler } from "./connection/liveTimeData";
 import { detailSaleUpdateByDevice } from "./service/detailSale.service";
 
 const app = express();
@@ -28,13 +29,13 @@ const server = require("http").createServer(app);
 
 //mqtt
 
-export const client = mqtt.connect("ws://192.168.0.105:9001", {
+export const client = mqtt.connect("ws://192.168.0.100:9001", {
   username: "detpos",
   password: "asdffdsa",
 });
 
 export const pub_topic = "detpos/local_server/";
-export const sub_topic = "detpos/device/"
+export const sub_topic = "detpos/device/";
 
 const connect = () => {
   client.subscribe("#", { qos: 0 }, function (err) {
@@ -46,18 +47,19 @@ const connect = () => {
   });
 };
 
-
-
 client.on("connect", connect);
 
 client.on("message", async (topic, message) => {
-  console.log(topic, "///", message.toString());
+  let data = topic.split("/");
+  console.log(topic, message.toString());
+  // console.log(data);
 
-  let data= topic.split("/")
-  // console.log(data)
+  if (data[2] == "Final") {
+    detailSaleUpdateByDevice(data[3], message.toString());
+  }
 
-  if(data[2] == "Final"){
-    detailSaleUpdateByDevice(data[3] , message.toString())
+  if (data[2] == "livedata") {
+    liveDataChangeHandler(message.toString());
   }
 
   // if (topic == "detpos/device/1") {
@@ -65,36 +67,33 @@ client.on("message", async (topic, message) => {
   // }
   // let income = topic + "/" + message.toString();
   //reseive data from device
-
 });
 
 // socket
-const io = require("socket.io-client");
+// const io = require("socket.io-client");
 
-let socket = io.connect("http://13.251.206.31:9000");
-socket.on("connect", () => {
-  console.log("Connected to Raspberry Pi server");
+// let socket = io.connect("http://13.251.206.31:9000");
+// socket.on("connect", () => {
+//   console.log("Connected to Raspberry Pi server");
 
-  // Send data to the Raspberry Pi server
-  socket.emit("test", "Hello from local");
+//   // Send data to the Raspberry Pi server
+//   socket.emit("test", "Hello from local");
 
-  // Receive data from the Raspberry Pi server
-  socket.on("test", (data) => {
-    console.log("Received data:", data);
-  });
-});
+//   // Receive data from the Raspberry Pi server
+//   socket.on("test", (data) => {
+//     console.log("Received data:", data);
+//   });
+// });
 
-socket.on("disconnect", () => {
-  console.log("Disconnected from Raspberry Pi server");
-});
+// socket.on("disconnect", () => {
+//   console.log("Disconnected from Raspberry Pi server");
+// });
 
 //require data
 
 const port = config.get<number>("port");
 const host = config.get<string>("host");
 const dbUrl = config.get<string>("dbUrl");
-
-
 
 //mongodb connection
 

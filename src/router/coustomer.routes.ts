@@ -1,19 +1,16 @@
-import { addCoustomerHandler, deletCoustomerHandler, getCoustomerHandler } from "../controller/coustomer.controller";
+import {
+  addCoustomerHandler,
+  deletCoustomerHandler,
+  getCoustomerHandler,
+  searchCoustomerHandler,
+} from "../controller/coustomer.controller";
 
-  const coustomerRoute = require("express").Router();
-  
-  coustomerRoute.get(
-    "/",
-    getCoustomerHandler
-  );
-  coustomerRoute.post(
-    "/",
-    addCoustomerHandler
-  );
-  coustomerRoute.delete(
-    "/",
-    deletCoustomerHandler
-  );
-  
-  export default coustomerRoute;
-  
+const coustomerRoute = require("express").Router();
+
+coustomerRoute.get("/", getCoustomerHandler);
+coustomerRoute.post("/", addCoustomerHandler);
+coustomerRoute.delete("/", deletCoustomerHandler);
+
+coustomerRoute.get("/search/:key", searchCoustomerHandler);
+
+export default coustomerRoute;

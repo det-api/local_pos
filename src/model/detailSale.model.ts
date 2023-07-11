@@ -18,46 +18,9 @@ export interface detailSaleDocument extends mongoose.Document {
   saleLiter: number;
   totalPrice: number;
   totalizer_liter: number;
+  isError: boolean;
   createAt: Date;
 }
-
-// const detailSaleSchema = new Schema({
-//   stationDetailId: {
-//     type: Schema.Types.ObjectId,
-//     require: true,
-//     ref: "stationDetail",
-//   },
-//   vocono: { type: String, required: true, unique: true },
-//   carNo: { type: String, default: null }, //manual
-//   vehicleType: { type: String, default: "car" }, //manual
-//   nozzleNo: { type: Number, required: true },
-//   fuelType: { type: String, required: true },
-
-//   cashType: {
-//     type: String,
-//     enum: ["Cash", "KBZ Pay", "Credi", "FOC", "Others"],
-//     require: true,
-//   },
-//   casherCode: { type: String, require: true },
-//   couObjId: { type: Schema.Types.ObjectId, default: null },
-//   asyncAlready: {
-//     type: String,
-//     enum: ["0", "1", "2"],
-//     require: true,
-//   },
-
-//   salePrice: { type: Number, default: 0 },
-//   saleLiter: { type: Number, default: 0 },
-//   totalPrice: { type: Number, default: 0 },
-//   totalizer_liter: { type: Number, default: 0 },
-//   totalizer_amount: { type: Number, default: 0 },
-
-//   dailyReportDate: {
-//     type: String,
-//     default: new Date().toLocaleDateString(`fr-CA`),
-//   },
-//   createAt: { type: Date, default: new Date() },
-// });
 
 const detailSaleSchema = new Schema({
   stationDetailId: {
@@ -66,21 +29,22 @@ const detailSaleSchema = new Schema({
     ref: "stationDetail",
   },
   vocono: { type: String, required: true, unique: true },
-  carNo: { type: String, default: null },
-  vehicleType: { type: String, default: "car" },
-  nozzleNo: { type: Number, required: true },
+  carNo: { type: String, required: true },
+  vehicleType: { type: String, required: true },
+  nozzleNo: { type: String, required: true },
   fuelType: { type: String, required: true },
 
   cashType: {
     type: String,
-    enum: ["Cash", "KBZ Pay", "Credit", "FOC", "Others"],
+    default: "Cash",
+    enum: ["Cash", "KBZ_Pay", "Credit", "FOC", "Debt", "Others"],
   },
   casherCode: { type: String, required: true },
   couObjId: { type: Schema.Types.ObjectId, default: null },
   asyncAlready: {
     type: String,
-    default : "0" ,
-    enum: ["0", "1", "2" , "3" , "4"],
+    default: "0",
+    enum: ["0", "1", "2"],
   },
 
   salePrice: { type: Number, default: 0 },
@@ -93,13 +57,13 @@ const detailSaleSchema = new Schema({
     type: String,
     default: new Date().toLocaleDateString("fr-CA"),
   },
+  isError: { type: Boolean, default: false },
   createAt: { type: Date, default: Date.now },
 });
 
-
 detailSaleSchema.pre("save", function (next) {
-  if (this.fuelType == "001-Octane Ron(92)" && this.salePrice < 5000) {
-    this.vehicleType = "Cycle";
+  if (this.vehicleType == "Cycle" && this.carNo != null) {
+    this.carNo = "-";
   }
   const options = { timeZone: "Asia/Yangon", hour12: false };
 
@@ -109,7 +73,7 @@ detailSaleSchema.pre("save", function (next) {
   let iso: Date = new Date(`${currentDate}T${currentDateTime}.000Z`);
 
   this.createAt = iso;
-  console.log(this)
+  // console.log(this);
 
   if (this.dailyReportDate) {
     next();

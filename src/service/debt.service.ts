@@ -1,10 +1,8 @@
 import { FilterQuery, UpdateQuery } from "mongoose";
 import config from "config";
-import debtModel, { debtDocument } from "../model/debt.model";
+import debtModel, { debtDocument, debtInput } from "../model/debt.model";
 
-export const getDebt = async (
-  query: FilterQuery<debtDocument>
-) => {
+export const getDebt = async (query: FilterQuery<debtDocument>) => {
   try {
     return await debtModel.find(query).lean().select("-__v");
   } catch (e) {
@@ -31,8 +29,9 @@ export const DebtPaginate = async (
   return { data, count };
 };
 
-export const addDebt = async (body: debtDocument) => {
+export const addDebt = async (body: debtInput) => {
   try {
+    console.log('addDebt')
     return await new debtModel(body).save();
   } catch (e) {
     throw new Error(e);
@@ -51,9 +50,7 @@ export const updateDebt = async (
   }
 };
 
-export const deleteDebt = async (
-  query: FilterQuery<debtDocument>
-) => {
+export const deleteDebt = async (query: FilterQuery<debtDocument>) => {
   try {
     let Debt = await debtModel.find(query);
     if (!Debt) {

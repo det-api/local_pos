@@ -3,7 +3,17 @@ import { Request, Response, NextFunction } from "express";
 import fMsg from "../utils/helper";
 import { getPermit } from "../service/permit.service";
 import { getRole } from "../service/role.service";
-import { deleteUser, getUser, loginUser, registerUser, updateUser, userAddPermit, userAddRole, userRemovePermit, userRemoveRole } from "../service/user.service";
+import {
+  deleteUser,
+  getUser,
+  loginUser,
+  registerUser,
+  updateUser,
+  userAddPermit,
+  userAddRole,
+  userRemovePermit,
+  userRemoveRole,
+} from "../service/user.service";
 
 export const registerUserHandler = async (
   req: Request,
@@ -25,7 +35,7 @@ export const loginUserHandler = async (
 ) => {
   try {
     let result = await loginUser(req.body);
-    fMsg(res, "registered users", result);
+    fMsg(res, "logined users", result);
   } catch (e) {
     next(e);
   }
@@ -37,8 +47,8 @@ export const getUserHandler = async (
   next: NextFunction
 ) => {
   try {
-    console.log('ek')
-    let result = await getUser(req.query)
+    console.log("ek");
+    let result = await getUser(req.query);
     fMsg(res, "registered users", result);
   } catch (e) {
     next(new Error(e));
