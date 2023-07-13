@@ -17,7 +17,7 @@ import {
   getFuelBalance,
 } from "../service/fuelBalance.service";
 import { fuelBalanceDocument } from "../model/fuelBalance.model";
-import { addDailyReport } from "../service/dailyReport.service";
+import { addDailyReport, getDailyReport } from "../service/dailyReport.service";
 import { deviceLiveData } from "../connection/liveTimeData";
 
 export const getDetailSaleHandler = async (
@@ -56,24 +56,36 @@ export const addDetailSaleHandler = async (
     // that is check the data with date already exist or not
 
     // let checkDate = await getFuelBalance({
-    //   stationId: req.body.stationDetailId,
-    //   createAt: req.body.dailyReportDate,
+    //   stationId: result.stationDetailId,
+    //   createAt: result.dailyReportDate,
     // });
 
-    // create the data in fuel balance db data with today date is not exist in db
+    // let checkRpDate = await getDailyReport({
+    //   stationId: result.stationDetailId,
+    //   dateOfDay: result.dailyReportDate,
+    // });
+
+    // if (checkRpDate.length == 0) {
+    //   let rp = await addDailyReport({
+    //     stationId: result.stationDetailId,
+    //     dateOfDay: result.dailyReportDate,
+    //   });
+    // }
+
+    // // console.log(checkDate);
+
+    // // create the data in fuel balance db data with today date is not exist in db
 
     // if (checkDate.length == 0) {
-    //   await addDailyReport({
-    //     stationId: req.body.stationDetailId,
-    //     dateOfDay: req.body.dailyReportDate,
-    //   });
-
-    //   let prevDate = previous(new Date(req.body.dailyReportDate));
+    //   console.log(req.body.dailyReportDate);
+    //   let prevDate = previous(new Date(result.dailyReportDate));
+    //   console.log(prevDate, "gg");
     //   let prevResult = await getFuelBalance({
-    //     stationId: req.body.stationDetailId,
+    //     stationId: result.stationDetailId,
     //     createAt: prevDate,
     //   });
-    //   // console.log(prevResult);
+    //   console.log(result.stationDetailId, prevDate);
+    //   console.log(prevResult);
     //   await Promise.all(
     //     prevResult.map(async (ea) => {
     //       let obj: fuelBalanceDocument;
@@ -106,7 +118,7 @@ export const addDetailSaleHandler = async (
     //   );
     // }
 
-    // calculation for fuel balance
+    // //calculation for fuel balance
 
     // await calcFuelBalance(
     //   {

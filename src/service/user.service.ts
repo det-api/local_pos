@@ -35,7 +35,7 @@ export const loginUser = async ({
     userObj["token"] = createToken(userObj);
 
     delete userObj.password;
-    console.log(userObj);
+    // console.log(userObj);
     return userObj;
   } catch (e) {
     throw new Error(e);

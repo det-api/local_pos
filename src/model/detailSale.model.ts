@@ -24,7 +24,7 @@ export interface detailSaleDocument extends mongoose.Document {
 
 const detailSaleSchema = new Schema({
   stationDetailId: {
-    type: Schema.Types.ObjectId,
+    type: String,
     required: true,
     ref: "stationDetail",
   },

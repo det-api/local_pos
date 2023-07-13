@@ -11,6 +11,6 @@ coustomerRoute.get("/", getCoustomerHandler);
 coustomerRoute.post("/", addCoustomerHandler);
 coustomerRoute.delete("/", deletCoustomerHandler);
 
-coustomerRoute.get("/search/:key", searchCoustomerHandler);
+coustomerRoute.get("/search", searchCoustomerHandler);
 
 export default coustomerRoute;

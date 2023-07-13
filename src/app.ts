@@ -21,7 +21,7 @@ import { liveDataChangeHandler } from "./connection/liveTimeData";
 import { detailSaleUpdateByDevice } from "./service/detailSale.service";
 
 const app = express();
-app.use(express.json());
+
 app.use(fileUpload());
 app.use(cors({ origin: "*" }));
 
@@ -51,7 +51,7 @@ client.on("connect", connect);
 
 client.on("message", async (topic, message) => {
   let data = topic.split("/");
-  console.log(topic, message.toString());
+  // console.log(topic, message.toString());
   // console.log(data);
 
   if (data[2] == "Final") {
@@ -70,26 +70,32 @@ client.on("message", async (topic, message) => {
 });
 
 // socket
-// const io = require("socket.io-client");
 
-// let socket = io.connect("http://13.251.206.31:9000");
-// socket.on("connect", () => {
-//   console.log("Connected to Raspberry Pi server");
+const io = require("socket.io-client");
 
-//   // Send data to the Raspberry Pi server
-//   socket.emit("test", "Hello from local");
+let socket = io.connect("http://13.251.206.31:9000");
 
-//   // Receive data from the Raspberry Pi server
-//   socket.on("test", (data) => {
-//     console.log("Received data:", data);
-//   });
-// });
+socket.on("connect", () => {
+  console.log("Connected to Raspberry Pi server");
 
-// socket.on("disconnect", () => {
-//   console.log("Disconnected from Raspberry Pi server");
-// });
+  // Send data to the Raspberry Pi server
+  socket.emit("test", "Hello from local");
 
-//require data
+  // Receive data from the Raspberry Pi server
+  socket.on("test", (data) => {
+    console.log("Received data:", data);
+  });
+});
+
+socket.on("disconnect", () => {
+  console.log("Disconnected from Raspberry Pi server");
+});
+
+// localsocket
+
+// let localsocket = io.connect(server)
+
+// require data
 
 const port = config.get<number>("port");
 const host = config.get<string>("host");

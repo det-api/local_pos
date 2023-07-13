@@ -52,10 +52,9 @@ export const searchCoustomerHandler = async (
   next: NextFunction
 ) => {
   try {
-    let key = req.params.key;
     // searchCoustomer(key)
-    console.log(typeof key);
-    let result = await searchCoustomer(key);
+    // console.log(req.query);
+    let result = await searchCoustomer(req.query);
     fMsg(res, "search result", result);
   } catch (e) {
     next(new Error(e));

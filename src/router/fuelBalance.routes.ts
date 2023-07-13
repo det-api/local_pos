@@ -14,8 +14,8 @@ import { fuelBalanceSchema } from "../schema/schema";
   
   fuelBalanceRoute.get(
     "/all",
-    validateToken,
-    hasAnyPermit(["view"]),
+    // validateToken,
+    // hasAnyPermit(["view"]),
     getAllFuelBalanceHandler
   );
   

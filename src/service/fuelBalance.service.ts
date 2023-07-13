@@ -11,7 +11,7 @@ export const getFuelBalance = async (
     return await fuelBalanceModel
       .find(query)
       .lean()
-      .populate("stationId")
+      // .populate("stationId")
       .select("-__v");
   } catch (e) {
     throw new Error(e);
@@ -74,6 +74,7 @@ export const calcFuelBalance = async (query, body, payload: number) => {
     };
 
     await fuelBalanceModel.updateMany({ _id: gg?._id }, obj);
+    console.log("caculated");
     return await fuelBalanceModel.find({ _id: gg?._id }).lean();
   } catch (e) {
     throw new Error(e);

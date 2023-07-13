@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 export interface coustomerDocument extends mongoose.Document {
   cou_name: string;
   cou_id: string;
+  cou_debt: number;
 }
 
 const coustomerSchema = new Schema({

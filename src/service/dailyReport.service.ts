@@ -12,7 +12,7 @@ export const getDailyReport = async (
     return await dailyReportModel
       .find(query)
       .lean()
-      .populate("stationId")
+      // .populate("stationId")
       .select("-__v");
   } catch (e) {
     throw new Error(e);
@@ -22,7 +22,9 @@ export const getDailyReport = async (
 export const addDailyReport = async (body: dailyReportDocument | {}) => {
   try {
     console.log("created  dailyReport");
-    return await new dailyReportModel(body).save();
+    let result = await new dailyReportModel(body).save();
+    console.log(result);
+    return result;
   } catch (e) {
     throw new Error(e);
   }
@@ -117,9 +119,7 @@ export const getDailyReportByMonth = async (
     },
   };
 
-  const result = await dailyReportModel
-    .find(filter)
-    .select("-__v");
+  const result = await dailyReportModel.find(filter).select("-__v");
 
   return result;
 };

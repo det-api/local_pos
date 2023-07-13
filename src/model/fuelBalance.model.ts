@@ -20,7 +20,6 @@ const fuelBalanceSchema = new Schema({
   stationId: {
     type: Schema.Types.ObjectId,
     ref: "stationDetail",
-    default: "6449f5a9a1808c9679bbed27",
   },
   fuelType: { type: String, required: true },
   capacity: { type: String, required: true },
